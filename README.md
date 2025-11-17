@@ -1,2 +1,2 @@
 # planner-app
-Planner App — це простий та зручний веб-застосунок для планування справ, створений на Flask з використанням MongoDB для зберігання даних. Застосунок дозволяє створювати, редагувати, переглядати та видаляти щоденні завдання, допомагаючи організувати свій час максимально ефективно.
+Planner App is a simple and user-friendly task planning web application built on Flask and using MongoDB for data storage. The application allows you to create, edit, view, and delete daily tasks, helping you organize your time as efficiently as possible.
