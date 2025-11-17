@@ -1,0 +1,1448 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="calendar-wrapper" id="calendarWrapper">
+  <div class="calendar-section" id="calendarSection">
+    <div class="calendar-header">
+      <button class="nav-btn" id="prevMonth">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <div class="header-center">
+        <h1 id="monthYear">{{ current_month_name }} {{ current_year }}</h1>
+        <p class="calendar-subtitle">   Організуй своє життя стильно</p>
+      </div>
+      <button class="nav-btn" id="nextMonth">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="current-time glass">
+      <span id="currentTime">🕐 Завантаження...</span>
+      <span id="currentDate"></span>
+    </div>
+
+    <div class="calendar-weekdays">
+      {% for wd in ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'] %}
+      <div class="weekday">{{ wd }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="calendar-grid" id="calendarGrid">
+      {% for week in weeks %}
+        {% for day in week %}
+          {% if day %}
+            <div class="day-cell glass {% if day.is_today %}today{% endif %}" data-date="{{ day.date }}">
+              <button class="day-button" data-date="{{ day.date }}">
+                <div class="day-number">{{ day.day_number }}</div>
+                <div class="day-stats">
+                  {% if day.tasks_count > 0 %}
+                    <span class="tasks-badge">{{ day.tasks_count }}</span>
+                  {% endif %}
+                  {% if day.stickers %}
+                    <span class="day-stickers">{{ day.stickers|join('') }}</span>
+                  {% endif %}
+                </div>
+              </button>
+
+              <div class="day-tasks-preview">
+                {% for task in day.tasks[:3] %}
+                  <div class="task-preview {% if task.is_completed %}completed{% endif %}"
+                       {% if task.category %}style="border-left: 3px solid {{ task.category.color }}"{% endif %}>
+                    <input type="checkbox" class="task-preview-checkbox" data-id="{{ task._id }}" {% if task.is_completed %}checked{% endif %}>
+                    {% if task.category %}
+                      <span class="task-category-icon">{{ task.category.icon }}</span>
+                    {% endif %}
+                    <label class="task-preview-title">{{ task.title }}</label>
+                  </div>
+                {% endfor %}
+                {% if day.tasks|length > 3 %}
+                  <div class="more-tasks">+{{ day.tasks|length - 3 }} ще</div>
+                {% endif %}
+              </div>
+            </div>
+          {% else %}
+            <div class="day-cell empty"></div>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="event-panel glass" id="eventPanel">
+    <div class="panel-header">
+      <h2 id="panelDate">Оберіть день</h2>
+      <button class="close-panel" id="closePanel">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Навігаційні вкладки -->
+    <div class="panel-tabs">
+      <button class="tab-btn active" data-tab="tasks">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <span>Завдання</span>
+      </button>
+      <button class="tab-btn" data-tab="create">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        <span>Створити</span>
+      </button>
+      <button class="tab-btn" data-tab="stickers">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+          <line x1="9" y1="9" x2="9.01" y2="9"/>
+          <line x1="15" y1="9" x2="15.01" y2="9"/>
+        </svg>
+        <span>Стікери</span>
+      </button>
+    </div>
+
+    <div class="panel-content">
+      <!-- Вкладка: Завдання -->
+      <div class="tab-content active" id="tabTasks">
+        <div class="tasks-header">
+          <h3>📋 Список завдань</h3>
+          <span class="tasks-count" id="tasksCount">0</span>
+        </div>
+        <div class="panel-tasks-list" id="panelTasks">
+          <div class="empty">📝 Немає задач на цей день</div>
+        </div>
+      </div>
+
+      <!-- Вкладка: Створити завдання -->
+      <div class="tab-content" id="tabCreate">
+        <h3>✨ Нове завдання</h3>
+        
+        <!-- Категорії -->
+        <div class="categories-section">
+          <label class="section-label">🏷️ Категорія</label>
+          <div class="categories-grid" id="categoriesGrid">
+            {% for cat in categories %}
+              <button class="category-pill" data-id="{{ cat._id }}" data-color="{{ cat.color_hex }}" data-icon="{{ cat.icon }}" data-name="{{ cat.name_ua }}">
+                <span class="category-icon">{{ cat.icon }}</span>
+                <span class="category-name">{{ cat.name_ua }}</span>
+                <span class="category-indicator" style="background: {{ cat.color_hex }}"></span>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="selected-category-display" id="selectedCategoryDisplay" style="display:none;">
+          <span id="selectedCategoryIcon"></span>
+          <span id="selectedCategoryName"></span>
+          <button type="button" id="clearCategory" class="clear-category-btn">✕</button>
+        </div>
+
+        <form id="taskForm">
+          <input type="hidden" id="taskId" value="">
+          <input type="hidden" id="selectedCategory" value="">
+          
+          <div class="form-group">
+            <label>📝 Назва</label>
+            <input type="text" id="taskTitle" placeholder="Назва завдання..." required>
+          </div>
+          
+          <div class="form-group">
+            <label>📄 Опис</label>
+            <textarea id="taskDescription" placeholder="Додайте опис (опціонально)" rows="3"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>⏰ Час</label>
+            <input type="time" id="taskTime">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="saveTaskBtn" class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              <span>Зберегти</span>
+            </button>
+            <button type="button" id="deleteTaskBtn" class="btn-danger" style="display:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              <span>Видалити</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Вкладка: Стікери -->
+      <div class="tab-content" id="tabStickers">
+        <div class="stickers-header">
+          <h3>🎨 Стікери</h3>
+          <p class="stickers-hint">Перетягніть на день в календарі</p>
+        </div>
+        <div class="stickers-grid">
+          {% for sticker in available_stickers %}
+            <button class="sticker-btn" draggable="true" data-sticker="{{ sticker }}">{{ sticker }}</button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<style>
+  :root {
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+    --accent: #ff7bb0;
+    --accent-hover: #ff5a9a;
+    --panel-bg: rgba(18,18,20,0.92);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.7);
+    --shadow: 0 8px 32px rgba(0,0,0,0.2);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * {
+    transition: var(--transition);
+  }
+
+  body {
+    background: linear-gradient(135deg, #453840 0%, #383b45 100%);
+    min-height: 100vh;
+  }
+
+  .calendar-wrapper {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    align-items: flex-start;
+    min-height: calc(100vh - 48px);
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .calendar-section {
+    flex: 1;
+    transition: var(--transition);
+  }
+
+  .calendar-section.full-width {
+    max-width: 100%;
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    gap: 48px;
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .header-center {
+    text-align: center;
+  }
+
+  .header-center h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    background: linear-gradient(135deg, #ff7bb0 0%, #ffa8d5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .calendar-subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+  }
+
+  .nav-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-btn:hover {
+    background: rgba(255,123,176,0.2);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,123,176,0.3);
+  }
+
+  .current-time {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    padding: 12px 24px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    animation: slideDown 0.5s ease-out;
+  }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  .weekday {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--accent);
+    padding: 8px;
+    background: var(--glass-bg);
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  .day-cell {
+    min-height: 120px;
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .day-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .day-cell:hover::before {
+    opacity: 1;
+  }
+
+  .day-cell.empty {
+    background: transparent;
+    border: 1px dashed rgba(255,255,255,0.05);
+    backdrop-filter: none;
+  }
+
+  .day-button {
+    all: unset;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .day-button:hover {
+    background: rgba(255,123,176,0.1);
+    transform: translateY(-2px);
+  }
+
+  .day-number {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+  }
+
+  .day-stats {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tasks-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  .day-stickers {
+    font-size: 1.1rem;
+    display: flex;
+    gap: 2px;
+  }
+
+  .day-tasks-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 4px;
+  }
+
+  .task-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    transition: var(--transition);
+    position: relative;
+  }
+
+  .task-preview:hover {
+    background: rgba(255,255,255,0.06);
+  }
+
+  .task-preview.completed {
+    opacity: 0.5;
+  }
+
+  .task-preview.completed .task-preview-title {
+    text-decoration: line-through;
+  }
+
+  .task-preview-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+
+  .task-category-icon {
+    font-size: 0.9rem;
+  }
+
+  .task-preview-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+  }
+
+  .more-tasks {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding: 4px;
+  }
+
+  .day-cell.today {
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 20px rgba(255,123,176,0.3);
+    animation: pulse 2s infinite;
+  }
+
+  .day-cell.selected {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(255,123,176,0.4);
+    transform: scale(1.02);
+  }
+
+  /* Panel */
+  .event-panel {
+    width: 440px;
+    position: sticky;
+    top: 24px;
+    background: var(--panel-bg);
+    padding: 0;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow);
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.4s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .event-panel.hidden {
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    margin: 0;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .panel-header h2 {
+    font-size: 1.3rem;
+    margin: 0;
+    color: var(--accent);
+  }
+
+  .close-panel {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .close-panel:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+  }
+
+  /* Tabs Navigation */
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .tab-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+
+  .tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .tab-btn.active {
+    color: var(--accent);
+  }
+
+  .tab-btn.active::after {
+    transform: scaleX(1);
+  }
+
+  /* Tab Content */
+  .panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .tab-content h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+
+  /* Tasks Tab */
+  .tasks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .tasks-header h3 {
+    margin: 0;
+  }
+
+  .tasks-count {
+    background: var(--accent);
+    color: white;
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  .panel-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-task-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.05);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    position: relative;
+  }
+
+  .panel-task-row.has-category {
+    border-left-width: 3px;
+  }
+
+  .panel-task-row:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--accent);
+  }
+
+  .panel-task-row .left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .panel-task-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .panel-task-category {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .panel-task-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .panel-task-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .panel-task-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .panel-task-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .edit-task-btn,
+  .delete-task-btn-inline {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .edit-task-btn:hover {
+    background: rgba(255,123,176,0.2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .delete-task-btn-inline:hover {
+    background: rgba(255,107,107,0.2);
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* Create Tab */
+  .section-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .categories-section {
+    margin-bottom: 20px;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .category-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-pill:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+  }
+
+  .category-pill.active {
+    border-color: var(--accent);
+    background: rgba(255,123,176,0.2);
+  }
+
+  .category-icon {
+    font-size: 1.2rem;
+  }
+
+  .category-name {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .category-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .selected-category-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255,123,176,0.15);
+    border: 1px solid var(--accent);
+    margin-bottom: 20px;
+  }
+
+  #selectedCategoryIcon {
+    font-size: 1.2rem;
+  }
+
+  #selectedCategoryName {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .clear-category-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+  }
+
+  .clear-category-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: var(--text-primary);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .form-group input[type="text"],
+  .form-group textarea,
+  .form-group input[type="time"] {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 3px rgba(255,123,176,0.1);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .form-actions button {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,123,176,0.4);
+  }
+
+  .btn-danger {
+    background: #ff6b6b;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+  }
+
+  /* Stickers Tab */
+  .stickers-header {
+    margin-bottom: 20px;
+  }
+
+  .stickers-header h3 {
+    margin: 0 0 8px 0;
+  }
+
+  .stickers-hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .stickers-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  .sticker-btn {
+    border-radius: 12px;
+    padding: 12px;
+    cursor: grab;
+    border: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.05);
+    font-size: 1.5rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sticker-btn:hover {
+    background: rgba(255,123,176,0.2);
+    border-color: var(--accent);
+    transform: scale(1.1);
+  }
+
+  .sticker-btn:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,123,176,0.3); }
+    50% { box-shadow: 0 0 30px rgba(255,123,176,0.5); }
+  }
+
+  /* Scrollbar */
+  .panel-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .panel-content::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+  }
+
+  .panel-content::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .calendar-wrapper {
+      flex-direction: column;
+    }
+
+    .event-panel {
+      position: static;
+      width: 100%;
+      max-height: 500px;
+    }
+
+    .event-panel.hidden {
+      transform: translateY(100%);
+    }
+
+    .calendar-section.full-width {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .header-center h1 {
+      font-size: 1.8rem;
+    }
+
+    .calendar-grid {
+      gap: 8px;
+    }
+
+    .day-cell {
+      min-height: 100px;
+      padding: 8px;
+    }
+
+    .day-number {
+      font-size: 1.1rem;
+    }
+
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stickers-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .tab-btn span {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+
+  let currentYear = JSON.parse('{{ current_year | default("0") }}');
+  let currentMonth = JSON.parse('{{ current_month | default("1") }}');
+  let selectedCategoryId = null;
+
+  function qs(sel, root=document) { return root.querySelector(sel); }
+  function qsa(sel, root=document) { return Array.from(root.querySelectorAll(sel)); }
+
+  function escapeHtml(s){
+    if(!s) return '';
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr + 'T00:00:00');
+    const days = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'];
+    const months = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 
+                    'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+  }
+
+  function switchTab(tabName) {
+    qsa('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    qsa('.tab-content').forEach(content => {
+      content.classList.toggle('active', content.id === 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+    });
+  }
+
+  function updateCategoryDisplay() {
+    const display = qs('#selectedCategoryDisplay');
+    qsa('.category-pill').forEach(p => p.classList.remove('active'));
+    
+    if (selectedCategoryId) {
+      const pill = qs(`.category-pill[data-id="${selectedCategoryId}"]`);
+      if (pill) {
+        pill.classList.add('active');
+        qs('#selectedCategoryIcon').textContent = pill.dataset.icon;
+        qs('#selectedCategoryName').textContent = pill.dataset.name;
+        display.style.display = 'flex';
+      }
+    } else {
+      display.style.display = 'none';
+    }
+  }
+
+  // ===== НОВАЯ ФУНКЦИЯ loadTasks =====
+  function loadTasks(date) {
+    console.log('loadTasks: Загрузка задач для', date);
+    
+    const panelTasks = qs('#panelTasks');
+    const tasksCount = qs('#tasksCount');
+    
+    if (!panelTasks || !tasksCount) {
+      console.error('ERROR: DOM elements not found!');
+      return;
+    }
+    
+    // Показуємо loading
+    panelTasks.innerHTML = '<div class="empty">⏳ Завантаження...</div>';
+    
+    const url = `/planner/get_tasks/${date}`;
+    console.log('Fetch URL:', url);
+    
+    fetch(url)
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(tasks => {
+        console.log('Tasks received:', tasks);
+        console.log('Tasks count:', Array.isArray(tasks) ? tasks.length : 'NOT AN ARRAY');
+        
+        if (!Array.isArray(tasks) || tasks.length === 0) {
+          console.log('No tasks or not an array');
+          panelTasks.innerHTML = '<div class="empty">📝 Немає задач на цей день<br><small>Перейдіть на вкладку "Створити" щоб додати</small></div>';
+          tasksCount.textContent = '0';
+          return;
+        }
+        
+        // Очищуємо контейнер
+        panelTasks.innerHTML = '';
+        tasksCount.textContent = tasks.length;
+        
+        // Додаємо кожне завдання
+        tasks.forEach((task, index) => {
+          console.log(`Creating task ${index + 1}:`, task.title);
+          
+          const row = document.createElement('div');
+          row.className = 'panel-task-row';
+          
+          if (task.category) {
+            row.classList.add('has-category');
+            row.style.borderLeftColor = task.category.color;
+          }
+          
+          const categoryHTML = task.category ? `<span class="panel-task-category">${task.category.icon}</span>` : '';
+          const timeHTML = task.time ? `<div class="panel-task-time">⏰ ${task.time}</div>` : '';
+          
+          row.innerHTML = `
+            <div class="left">
+              <input type="checkbox" class="panel-task-checkbox" data-id="${task._id}" ${task.is_completed ? 'checked' : ''}/>
+              ${categoryHTML}
+              <div class="panel-task-info">
+                <div class="panel-task-title">${escapeHtml(task.title)}</div>
+                ${timeHTML}
+              </div>
+            </div>
+            <div class="panel-task-actions">
+              <button class="edit-task-btn" data-id="${task._id}" title="Редагувати">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button class="delete-task-btn-inline" data-id="${task._id}" title="Видалити">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          `;
+          
+          // Чекбокс toggle
+          row.querySelector('.panel-task-checkbox').addEventListener('change', () => {
+            fetch(`/planner/toggle_task/${task._id}`, { method: 'POST' })
+              .then(() => {
+                loadTasks(date);
+                refreshCalendar();
+              })
+              .catch(err => console.error('Toggle error:', err));
+          });
+          
+          // Редагування
+          row.querySelector('.edit-task-btn').addEventListener('click', () => {
+            openEditForm(task);
+          });
+          
+          // Видалення
+          row.querySelector('.delete-task-btn-inline').addEventListener('click', () => {
+            if (confirm('Видалити завдання?')) {
+              fetch(`/planner/delete_task/${task._id}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(() => {
+                  loadTasks(date);
+                  refreshCalendar();
+                })
+                .catch(err => console.error('Delete error:', err));
+            }
+          });
+          
+          panelTasks.appendChild(row);
+        });
+        
+        console.log('✅ All tasks rendered successfully');
+      })
+      .catch(err => {
+        console.error('ERROR in loadTasks:', err);
+        panelTasks.innerHTML = `<div class="empty" style="color: #ff6b6b;">❌ Помилка: ${err.message}</div>`;
+      });
+  }
+
+  function showPanelFor(date) {
+    console.log('Show panel for date:', date);
+    const panel = qs('#eventPanel');
+    const calendarSection = qs('#calendarSection');
+    
+    qsa('.day-cell').forEach(el => el.classList.toggle('selected', el.dataset.date === date));
+    qs('#panelDate').textContent = formatDate(date);
+    
+    panel.classList.remove('hidden');
+    calendarSection.classList.remove('full-width');
+    
+    switchTab('tasks');
+    resetForm();
+    loadTasks(date);
+  }
+
+  function openEditForm(task) {
+    switchTab('create');
+    
+    qs('#taskId').value = task._id;
+    qs('#taskTitle').value = task.title;
+    qs('#taskDescription').value = task.description || '';
+    qs('#taskTime').value = task.time || '';
+    qs('#deleteTaskBtn').style.display = 'inline-flex';
+    qs('#saveTaskBtn').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+      <span>Оновити</span>
+    `;
+    
+    if (task.category) {
+      selectedCategoryId = task.category.id;
+      updateCategoryDisplay();
+    } else {
+      selectedCategoryId = null;
+      updateCategoryDisplay();
+    }
+    
+    qs('#taskTitle').focus();
+  }
+
+  function resetForm() {
+    const form = qs('#taskForm');
+    if (form) form.reset();
+    qs('#taskId').value = '';
+    qs('#deleteTaskBtn').style.display = 'none';
+    qs('#saveTaskBtn').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+      <span>Зберегти</span>
+    `;
+    selectedCategoryId = null;
+    updateCategoryDisplay();
+  }
+
+  function refreshCalendar() {
+    location.reload();
+  }
+
+  function changeMonth(offset) {
+    currentMonth += offset;
+    if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+    if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+    const params = new URLSearchParams({ month: currentMonth, year: currentYear });
+    location.href = `${location.pathname}?${params.toString()}`;
+  }
+
+  // ===== MAIN INITIALIZATION =====
+  document.addEventListener('DOMContentLoaded', () => {
+    const panel = qs('#eventPanel');
+    const calendarSection = qs('#calendarSection');
+    
+    panel.classList.add('hidden');
+    calendarSection.classList.add('full-width');
+
+    // Годинник
+    function updateClock(){ 
+      const now = new Date();
+      qs('#currentTime').textContent = `🕐 ${now.toLocaleTimeString('uk-UA')}`;
+      qs('#currentDate').textContent = now.toLocaleDateString('uk-UA', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+    updateClock(); 
+    setInterval(updateClock, 1000);
+
+    // Кнопки днів
+    qsa('.day-button').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        const date = btn.dataset.date;
+        if (date) {
+          showPanelFor(date);
+        }
+      });
+    });
+
+    // Перемикання вкладок
+    qsa('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchTab(btn.dataset.tab);
+      });
+    });
+
+    // Вибір категорії
+    qsa('.category-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const catId = pill.dataset.id;
+        if (selectedCategoryId === catId) {
+          selectedCategoryId = null;
+        } else {
+          selectedCategoryId = catId;
+        }
+        updateCategoryDisplay();
+      });
+    });
+
+    // Очистити категорію
+    const clearCatBtn = qs('#clearCategory');
+    if (clearCatBtn) {
+      clearCatBtn.addEventListener('click', () => {
+        selectedCategoryId = null;
+        updateCategoryDisplay();
+      });
+    }
+
+    // Стікери drag
+    qsa('.sticker-btn').forEach(s => {
+      s.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', s.dataset.sticker);
+      });
+    });
+
+    qsa('.day-cell').forEach(cell => {
+      if(cell.classList.contains('empty')) return;
+      cell.addEventListener('dragover', e => e.preventDefault());
+      cell.addEventListener('drop', e => {
+        e.preventDefault();
+        const sticker = e.dataTransfer.getData('text/plain');
+        const date = cell.dataset.date;
+        fetch('/planner/add_sticker', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ date, sticker })
+        }).then(() => refreshCalendar());
+      });
+    });
+
+    // Закриття панелі
+    qs('#closePanel').addEventListener('click', () => {
+      panel.classList.add('hidden');
+      calendarSection.classList.add('full-width');
+      qsa('.day-cell').forEach(el => el.classList.remove('selected'));
+      resetForm();
+    });
+
+    // Навігація місяцями
+    qs('#prevMonth').addEventListener('click', () => changeMonth(-1));
+    qs('#nextMonth').addEventListener('click', () => changeMonth(1));
+
+    // Форма додавання/редагування завдання
+    qs('#taskForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const id = qs('#taskId').value || null;
+      const currentDateForTask = qsa('.day-cell.selected')[0]?.dataset.date;
+      
+      if (!currentDateForTask) {
+        alert('Оберіть день для збереження завдання');
+        return;
+      }
+      
+      const payload = {
+        title: qs('#taskTitle').value.trim(),
+        description: qs('#taskDescription').value.trim(),
+        time: qs('#taskTime').value || null,
+        date: currentDateForTask,
+        category_id: selectedCategoryId
+      };
+      
+      const url = id ? `/planner/edit_task/${id}` : '/planner/add_task';
+      fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      }).then(r => r.json())
+        .then(res => {
+          if(res.error) return alert(res.error);
+          
+          resetForm();
+          loadTasks(currentDateForTask);
+          refreshCalendar();
+          switchTab('tasks');
+        }).catch(err => console.error(err));
+    });
+
+    // Видалення завдання з форми
+    qs('#deleteTaskBtn').addEventListener('click', () => {
+      const id = qs('#taskId').value;
+      if(!id) return;
+      if(!confirm('Видалити завдання?')) return;
+      
+      fetch(`/planner/delete_task/${id}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(res => {
+          if(res.success) {
+            const currentDateForTask = qsa('.day-cell.selected')[0]?.dataset.date;
+            resetForm();
+            loadTasks(currentDateForTask);
+            refreshCalendar();
+            switchTab('tasks');
+          } else {
+            alert(res.error || 'Помилка');
+          }
+        });
+    });
+
+    // Чекбокси в превью календаря
+    qsa('.task-preview-checkbox').forEach(cb => {
+      cb.addEventListener('change', e => {
+        e.stopPropagation();
+        const id = cb.dataset.id;
+        fetch(`/planner/toggle_task/${id}`, { method: 'POST' })
+          .then(() => refreshCalendar());
+      });
+    });
+  });
+</script>
+{% endblock %}

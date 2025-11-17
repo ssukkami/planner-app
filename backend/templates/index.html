@@ -1,0 +1,975 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="home-wrapper">
+    <!-- Hero секція -->
+    <div class="hero-section glass">
+        <div class="hero-content">
+            <!-- Hero іконка -->
+            <div class="hero-icon">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+                    <path d="M16 2v4M8 2v4M3 10h18" />
+                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
+                </svg>
+            </div>
+            <h1 class="hero-title">Planner App</h1>
+            <p class="hero-subtitle">Організуй своє життя стильно та ефективно з допомогою AI</p>
+
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <span>Почати безкоштовно</span>
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+                    </svg>
+                    <span>Увійти</span>
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">1000+</span>
+                    <span class="stat-label">Користувачів</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50K+</span>
+                    <span class="stat-label">Завершених завдань</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">4.9/5</span>
+                    <span class="stat-label">Рейтинг</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Функції -->
+    <div class="features-section">
+        <h2 class="section-title">Чому Planner App?</h2>
+        <div class="features-grid">
+            <div class="feature-card glass">
+                <div class="feature-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                        <line x1="8" y1="14" x2="8" y2="14.01" />
+                        <line x1="12" y1="14" x2="12" y2="14.01" />
+                        <line x1="16" y1="14" x2="16" y2="14.01" />
+                        <line x1="8" y1="18" x2="8" y2="18.01" />
+                        <line x1="12" y1="18" x2="12" y2="18.01" />
+                    </svg>
+                </div>
+                <h3>Інтуїтивний календар</h3>
+                <p>Зручний інтерфейс для планування завдань на кожен день. Drag & Drop, кольорове кодування та швидке
+                    додавання подій.</p>
+            </div>
+
+            <div class="feature-card glass">
+                <div class="feature-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                        <circle cx="12" cy="12" r="5" />
+                        <path d="M12 8v4l2 2" />
+                    </svg>
+                </div>
+                <h3>AI-аналіз настрою</h3>
+                <p>Штучний інтелект аналізує ваші записи та надає персоналізовані рекомендації для покращення
+                    продуктивності.</p>
+            </div>
+
+            <div class="feature-card glass">
+                <div class="feature-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" />
+                    </svg>
+                </div>
+                <h3>Персоналізація</h3>
+                <p>Кастомізуйте календар за своїм смаком: стікери, кольори днів, теми оформлення та багато іншого.</p>
+            </div>
+
+            <div class="feature-card glass">
+                <div class="feature-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg>
+                </div>
+                <h3>Статистика та аналітика</h3>
+                <p>Відстежуйте свій прогрес, аналізуйте продуктивність та отримуйте досягнення за виконані завдання.</p>
+            </div>
+
+            <div class="feature-card glass">
+                <div class="feature-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </div>
+                <h3>Безпека даних</h3>
+                <p>Всі ваші дані зашифровані та зберігаються на захищених серверах. Повна конфіденційність гарантована.
+                </p>
+            </div>
+
+            <div class="feature-card glass">
+                <div class="feature-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                    </svg>
+                </div>
+                <h3>Доступ з будь-якого пристрою</h3>
+                <p>Синхронізація між усіма пристроями. Працюйте з планером на комп'ютері, планшеті або смартфоні.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Новини та поради -->
+    <div class="news-section">
+        <h2 class="section-title">Поради для продуктивності</h2>
+        <div class="news-grid">
+            <div class="news-card glass">
+                <div class="news-image">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                </div>
+                <div class="news-content">
+                    <h3>5 правил ефективного планування</h3>
+                    <p>Дізнайтеся, як правильно розподіляти завдання протягом дня для максимальної продуктивності.</p>
+                    <span class="news-date">15 листопада 2025</span>
+                </div>
+            </div>
+
+            <div class="news-card glass">
+                <div class="news-image">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                    </svg>
+                </div>
+                <div class="news-content">
+                    <h3>Баланс між роботою та відпочинком</h3>
+                    <p>Чому важливо робити перерви та як правильно відпочивати, щоб уникнути вигорання.</p>
+                    <span class="news-date">12 листопада 2025</span>
+                </div>
+            </div>
+
+            <div class="news-card glass">
+                <div class="news-image">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </div>
+                <div class="news-content">
+                    <h3>Техніка Pomodoro для початківців</h3>
+                    <p>Простий і ефективний метод управління часом, який допоможе вам досягти більшого.</p>
+                    <span class="news-date">10 листопада 2025</span>
+                </div>
+            </div>
+
+            <div class="news-card glass">
+                <div class="news-image">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M3 3v18h18" />
+                        <path d="M18 17V9M13 17V5M8 17v-3" />
+                    </svg>
+                </div>
+                <div class="news-content">
+                    <h3>Як відстежувати свій прогрес</h3>
+                    <p>Використовуйте статистику та аналітику для кращого розуміння своїх звичок.</p>
+                    <span class="news-date">8 листопада 2025</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Відгуки -->
+    <div class="testimonials-section">
+        <h2 class="section-title">Що кажуть користувачі</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial-card glass">
+                <div class="testimonial-stars">
+                    <svg width="100" height="20" viewBox="0 0 100 20" fill="#ffc107">
+                        <polygon points="10,0 13,7 20,7 14,11 16,18 10,14 4,18 6,11 0,7 7,7" />
+                        <polygon points="30,0 33,7 40,7 34,11 36,18 30,14 24,18 26,11 20,7 27,7" />
+                        <polygon points="50,0 53,7 60,7 54,11 56,18 50,14 44,18 46,11 40,7 47,7" />
+                        <polygon points="70,0 73,7 80,7 74,11 76,18 70,14 64,18 66,11 60,7 67,7" />
+                        <polygon points="90,0 93,7 100,7 94,11 96,18 90,14 84,18 86,11 80,7 87,7" />
+                    </svg>
+                </div>
+                <p class="testimonial-text">"Найкращий планер, який я коли-небудь використовувала! Дизайн просто
+                    неймовірний, а функції AI допомагають мені краще зрозуміти свій настрій."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">О</div>
+                    <div>
+                        <p class="author-name">Оксана М.</p>
+                        <p class="author-role">Маркетолог</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card glass">
+                <div class="testimonial-stars">
+                    <svg width="100" height="20" viewBox="0 0 100 20" fill="#ffc107">
+                        <polygon points="10,0 13,7 20,7 14,11 16,18 10,14 4,18 6,11 0,7 7,7" />
+                        <polygon points="30,0 33,7 40,7 34,11 36,18 30,14 24,18 26,11 20,7 27,7" />
+                        <polygon points="50,0 53,7 60,7 54,11 56,18 50,14 44,18 46,11 40,7 47,7" />
+                        <polygon points="70,0 73,7 80,7 74,11 76,18 70,14 64,18 66,11 60,7 67,7" />
+                        <polygon points="90,0 93,7 100,7 94,11 96,18 90,14 84,18 86,11 80,7 87,7" />
+                    </svg>
+                </div>
+                <p class="testimonial-text">"Використовую Planner App вже 3 місяці. Моя продуктивність зросла на 40%!
+                    Дуже зручно планувати завдання та відстежувати прогрес."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">А</div>
+                    <div>
+                        <p class="author-name">Андрій К.</p>
+                        <p class="author-role">IT-спеціаліст</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card glass">
+                <div class="testimonial-stars">
+                    <svg width="100" height="20" viewBox="0 0 100 20" fill="#ffc107">
+                        <polygon points="10,0 13,7 20,7 14,11 16,18 10,14 4,18 6,11 0,7 7,7" />
+                        <polygon points="30,0 33,7 40,7 34,11 36,18 30,14 24,18 26,11 20,7 27,7" />
+                        <polygon points="50,0 53,7 60,7 54,11 56,18 50,14 44,18 46,11 40,7 47,7" />
+                        <polygon points="70,0 73,7 80,7 74,11 76,18 70,14 64,18 66,11 60,7 67,7" />
+                        <polygon points="90,0 93,7 100,7 94,11 96,18 90,14 84,18 86,11 80,7 87,7" />
+                    </svg>
+                </div>
+                <p class="testimonial-text">"Чудовий застосунок для тих, хто хоче організувати своє життя. Особливо
+                    подобається можливість персоналізації та стікери!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">М</div>
+                    <div>
+                        <p class="author-name">Марія С.</p>
+                        <p class="author-role">Студентка</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA секція -->
+    <div class="cta-section glass">
+        <div class="cta-icon">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+        </div>
+        <h2>Готові почати свій шлях до продуктивності?</h2>
+        <p>Приєднуйтесь до тисяч користувачів, які вже змінили своє життя з Planner App</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-cta">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+            <span>Почати безкоштовно</span>
+        </a>
+    </div>
+</div>
+
+<style>
+    .home-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        text-align: center;
+        padding: 80px 40px;
+        margin-bottom: 80px;
+        animation: fadeInUp 0.8s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 123, 176, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-icon {
+        margin-bottom: 30px;
+        animation: float 3s ease-in-out infinite;
+        display: inline-block;
+    }
+
+    .hero-icon svg {
+        color: #ff7bb0;
+        filter: drop-shadow(0 8px 16px rgba(255, 123, 176, 0.4));
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .hero-title {
+        font-size: 72px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        background: linear-gradient(135deg, #ffffff 0%, #ff7bb0 50%, #ff5a9a 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -2px;
+    }
+
+    .hero-subtitle {
+        font-size: 22px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 48px;
+        max-width: 650px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 60px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 16px 32px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn svg {
+        transition: transform 0.3s ease;
+    }
+
+    .btn:hover svg {
+        transform: translateX(4px);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ff7bb0 0%, #ff5a9a 100%);
+        box-shadow: 0 8px 24px rgba(255, 123, 176, 0.4);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 32px rgba(255, 123, 176, 0.6);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 60px;
+        justify-content: center;
+        padding-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        animation: fadeIn 1s ease;
+    }
+
+    .stat-number {
+        font-size: 36px;
+        font-weight: 700;
+        color: #ff7bb0;
+        text-shadow: 0 0 20px rgba(255, 123, 176, 0.3);
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Sections */
+    .section-title {
+        text-align: center;
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 60px;
+        background: linear-gradient(135deg, #ffffff 0%, #ff7bb0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -1px;
+    }
+
+    /* Features Section */
+    .features-section {
+        margin-bottom: 100px;
+        animation: fadeInUp 1s ease 0.2s both;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 28px;
+    }
+
+    .feature-card {
+        padding: 40px 32px;
+        text-align: center;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #ff7bb0, #ff5a9a);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-12px);
+        border-color: rgba(255, 123, 176, 0.3);
+        box-shadow: 0 12px 36px rgba(255, 123, 176, 0.2);
+    }
+
+    .feature-icon {
+        margin-bottom: 24px;
+        display: inline-block;
+        transition: all 0.4s ease;
+    }
+
+    .feature-icon svg {
+        color: #ff7bb0;
+        filter: drop-shadow(0 4px 12px rgba(255, 123, 176, 0.3));
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-card h3 {
+        font-size: 24px;
+        color: #ff7bb0;
+        margin-bottom: 16px;
+        font-weight: 600;
+    }
+
+    .feature-card p {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.7;
+    }
+
+    /* News Section */
+    .news-section {
+        margin-bottom: 100px;
+        animation: fadeInUp 1s ease 0.4s both;
+    }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 28px;
+    }
+
+    .news-card {
+        padding: 0;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .news-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255, 123, 176, 0.3);
+        box-shadow: 0 12px 36px rgba(255, 123, 176, 0.2);
+    }
+
+    .news-image {
+        padding: 48px;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(255, 123, 176, 0.15), rgba(255, 123, 176, 0.05));
+        transition: all 0.4s ease;
+    }
+
+    .news-card:hover .news-image {
+        background: linear-gradient(135deg, rgba(255, 123, 176, 0.25), rgba(255, 123, 176, 0.1));
+    }
+
+    .news-image svg {
+        color: #ff7bb0;
+        filter: drop-shadow(0 4px 12px rgba(255, 123, 176, 0.3));
+        transition: transform 0.4s ease;
+    }
+
+    .news-card:hover .news-image svg {
+        transform: scale(1.1);
+    }
+
+    .news-content {
+        padding: 28px;
+    }
+
+    .news-content h3 {
+        font-size: 20px;
+        color: #ff7bb0;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .news-content p {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.7;
+        margin-bottom: 16px;
+    }
+
+    .news-date {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Testimonials Section */
+    .testimonials-section {
+        margin-bottom: 100px;
+        animation: fadeInUp 1s ease 0.6s both;
+    }
+
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 28px;
+    }
+
+    .testimonial-card {
+        padding: 36px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255, 123, 176, 0.3);
+        box-shadow: 0 12px 36px rgba(255, 123, 176, 0.2);
+    }
+
+    .testimonial-stars {
+        margin-bottom: 20px;
+        animation: fadeIn 1s ease;
+    }
+
+    .testimonial-text {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.8;
+        margin-bottom: 24px;
+        font-style: italic;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .testimonial-text::before {
+        content: '"';
+        position: absolute;
+        left: 0;
+        top: -10px;
+        font-size: 48px;
+        color: rgba(255, 123, 176, 0.3);
+        font-family: Georgia, serif;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .author-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff7bb0 0%, #ff5a9a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 4px 16px rgba(255, 123, 176, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover .author-avatar {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(255, 123, 176, 0.6);
+    }
+
+    .author-name {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 4px;
+        font-size: 16px;
+    }
+
+    .author-role {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* CTA Section */
+    .cta-section {
+        text-align: center;
+        padding: 80px 40px;
+        animation: fadeInUp 1s ease 0.8s both;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 123, 176, 0.15) 0%, transparent 60%);
+    }
+
+    .cta-icon {
+        margin: 0 auto 24px;
+        animation: pulse 2s ease-in-out infinite;
+        display: inline-block;
+    }
+
+    .cta-icon svg {
+        color: #ff7bb0;
+        filter: drop-shadow(0 8px 16px rgba(255, 123, 176, 0.5));
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+    }
+
+    .cta-section h2 {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-section p {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-cta {
+        font-size: 18px;
+        padding: 18px 40px;
+        background: linear-gradient(135deg, #ff7bb0 0%, #ff5a9a 100%);
+        box-shadow: 0 8px 24px rgba(255, 123, 176, 0.5);
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-cta:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 12px 36px rgba(255, 123, 176, 0.7);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .hero-title {
+            font-size: 56px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 40px;
+        }
+
+        .features-grid,
+        .news-grid,
+        .testimonials-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .home-wrapper {
+            padding: 16px;
+        }
+
+        .hero-section {
+            padding: 60px 20px;
+            margin-bottom: 60px;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .hero-stats {
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+
+        .features-grid,
+        .news-grid,
+        .testimonials-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .feature-card,
+        .testimonial-card {
+            padding: 28px;
+        }
+
+        .news-image {
+            padding: 36px;
+        }
+
+        .news-content {
+            padding: 24px;
+        }
+
+        .cta-section {
+            padding: 60px 20px;
+        }
+
+        .cta-section h2 {
+            font-size: 32px;
+        }
+
+        .cta-section p {
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 36px;
+        }
+
+        .hero-icon svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+        }
+
+        .feature-icon svg,
+        .news-image svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .section-title {
+            font-size: 28px;
+        }
+
+        .feature-card h3,
+        .news-content h3 {
+            font-size: 20px;
+        }
+    }
+
+    /* Glass effect enhancement */
+    .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Selection color */
+    ::selection {
+        background: rgba(255, 123, 176, 0.3);
+        color: white;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #ff7bb0, #ff5a9a);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #ff5a9a, #ff7bb0);
+    }
+</style>
+{% endblock %}

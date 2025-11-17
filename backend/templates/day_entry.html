@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="glass center-card">
+    <h2>Завершення дня</h2>
+    <form method="POST">
+        <textarea name="description" placeholder="Опиши свій день..." required>{{ entry.user_description if entry else '' }}</textarea>
+        <label>Оцінка настрою:</label>
+        <input type="number" name="mood" min="1" max="10" value="{{ entry.user_mood_rating if entry else 5 }}">
+        <button type="submit" class="btn">Завершити день</button>
+    </form>
+    {% if ai_result %}
+    <div class="glass ai-result">
+        <h3>Аналіз дня ШІ:</h3>
+        <p>Настрій: {{ ai_result.ai_mood_label_ua }}</p>
+        <p>Резюме: {{ ai_result.ai_summary_ua }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

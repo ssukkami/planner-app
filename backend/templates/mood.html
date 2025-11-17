@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="glass center-card">
+    <h2>Оцініть свій настрій</h2>
+    <form method="POST">
+        <input type="number" name="mood" min="1" max="10" required>
+        <button type="submit" class="btn">Відправити</button>
+    </form>
+</div>
+{% endblock %}

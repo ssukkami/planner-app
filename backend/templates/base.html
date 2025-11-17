@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Planner App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+
+</head>
+
+<body>
+  <header>
+    <nav class="glass-nav">
+      <ul>
+        {% if 'user_id' in session %}
+        <li><a href="{{ url_for('planner.calendar_view') }}">Головна</a></li>
+        <li><a href="{{ url_for('planner.calendar_view') }}">Планер</a></li>
+        <li><a href="{{ url_for('auth.profile') }}">Профіль</a></li>
+        <li><a href="{{ url_for('auth.logout') }}">Вихід</a></li>
+        {% else %}
+        <li><a href="{{ url_for('auth.login') }}">Вхід</a></li>
+        <li><a href="{{ url_for('auth.register') }}">Реєстрація</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes glass">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+
+</html>
