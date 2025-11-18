@@ -1,6 +1,8 @@
 from flask import Flask, render_template, session
 from flask_pymongo import PyMongo
 from backend.config import MONGO_URI, SECRET_KEY
+import ssl
+import certifi
 
 from backend.routes.auth import auth_bp
 from backend.routes.planner import planner_bp
@@ -10,6 +12,18 @@ app = Flask(__name__)
 # Налаштування
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MONGO_URI'] = MONGO_URI
+
+# PyMongo конфіг для SSL/TLS на Render
+app.config['MONGOCLIENT_KWARGS'] = {
+    'ssl': True,
+    'ssl_cert_reqs': 'CERT_NONE',
+    'tlsAllowInvalidCertificates': True,
+    'tlsCAFile': certifi.where(),
+    'serverSelectionTimeoutMS': 5000,
+    'connectTimeoutMS': 10000,
+    'socketTimeoutMS': 10000,
+    'retryWrites': True,
+}
 
 # Ініціалізація Mongo
 mongo = PyMongo(app)
