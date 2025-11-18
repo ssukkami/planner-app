@@ -1,7 +1,7 @@
 # backend/app.py
 from flask import Flask, render_template, session
 from flask_pymongo import PyMongo
-from config import MONGO_URI, SECRET_KEY
+from backend.config import MONGO_URI, SECRET_KEY
 
 # Імпортуємо маршрути
 from routes.auth import auth_bp
