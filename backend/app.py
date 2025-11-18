@@ -3,9 +3,8 @@ from flask import Flask, render_template, session
 from flask_pymongo import PyMongo
 from backend.config import MONGO_URI, SECRET_KEY
 
-# Імпортуємо маршрути
-from routes.auth import auth_bp
-from routes.planner import planner_bp
+from backend.routes.auth import auth_bp
+from backend.routes.planner import planner_bp
 # from routes.ai import ai_bp  # якщо буде AI маршрут
 
 app = Flask(__name__)
